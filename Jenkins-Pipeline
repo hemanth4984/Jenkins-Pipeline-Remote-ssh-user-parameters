@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    environment {
+        DISABLE_AUTH = 'Anitha'
+        DB_ENGINE    = 'Saimukesh'
+    }
+    stages {
+        stage('Preparation') {
+            steps{
+                script{
+                    def userInput = input(id: 'userInput', message: 'Let\'s promote?', parameters: [
+                    [$class: 'TextParameterDefinition', defaultValue: 'uat', description: 'Environment', name: 'env']
+                    ])
+                    env.NAME = input message: 'Please enter the name',
+                    parameters: [string(defaultValue: '',
+                                description: '',
+                                name: 'name')]
+                   env.HOST = input message: 'Please enter the host',
+                             parameters: [string(defaultValue: '',
+                                          description: '',
+                                          name: 'host')]
+                                         
+                    
+                echo ("Env: "+userInput)
+                sshagent(credentials : ['GCP-User-Login']) {
+                    echo ("Env: "+userInput)
+                  sh """
+                 ssh   deployer@$userInput "curl ident.me ;
+sudo apt-get update -y
+whoami
+date
+touch $DISABLE_AUTH
+sed -i "/server.name/d" hemanth
+echo  server.name=${env.NAME} >> hemanth
+sed -i "/server.host/d" hemanth
+echo  server.host=${env.HOST} >> hemanth
+ cat hemanth"
+                  
+                   """
+                   }
+                  
+                } 
+                }
+        }
+    }
+
+}
